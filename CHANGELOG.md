@@ -183,6 +183,80 @@ GET  /api/settings/user
 
 ---
 
+## 🎯 **[Planned] - Module C Course Planner - Detailed Feature Specification** 
+
+### 🏗️ **Visual Course Structure Builder Features**
+- **Interactive Drag & Drop System**
+  - Seamless element reordering within course hierarchy
+  - Visual drop zones with real-time feedback
+  - Undo/redo functionality for structure changes
+  - Auto-save during drag operations
+
+- **Hierarchical Course Organization** 
+  - Four-level structure: Cours → Modules → Chapitres → Leçons
+  - Expandable/collapsible tree view
+  - Visual progress indicators and completion status
+  - Flexible nesting and dependency management
+
+- **Professional Template System**
+  - **Business & Corporate**: Leadership, Sales, Compliance, Onboarding
+  - **Technology & IT**: Programming, Data Science, Cybersecurity, Cloud
+  - **Education & Academic**: K-12, Higher Ed, Research Methods, STEM
+  - **Creative & Arts**: Design, Digital Arts, Writing, Photography
+
+### 🤖 **AI-Powered Course Generation Features**
+- **Intelligent Document Analysis**
+  - Automatic content extraction from uploaded documents (PDF, DOCX, etc.)
+  - Key concept identification and topic clustering
+  - Content difficulty assessment and complexity scoring
+  - Learning objective suggestion based on content analysis
+
+- **Architect Agent Integration**
+  - Optimal course structure proposals based on content
+  - Learning path optimization for maximum retention
+  - Adaptive difficulty progression recommendations
+  - Cross-reference and dependency mapping automation
+
+- **Smart Content Distribution**
+  - Intelligent content chunking into digestible sections
+  - Balanced lesson length optimization for engagement
+  - Assessment point identification and placement
+  - Progressive skill building sequence generation
+
+### 📊 **Advanced Planning & Analytics Features**
+- **AI-Powered Duration Estimation**
+  - Reading time calculation based on content complexity
+  - Different learning pace accommodations (beginner/intermediate/advanced)
+  - Practice and assessment time allocation
+  - Total course completion time with confidence intervals
+
+- **SMART Learning Objectives System**
+  - Automatic generation of Specific, Measurable, Achievable, Relevant, Time-bound objectives
+  - Bloom's taxonomy integration for cognitive level targeting
+  - Competency-based learning outcomes mapping
+  - Skills progression tracking and validation framework
+
+- **Competency Sequencing & Prerequisites**
+  - Intelligent skill dependency mapping and visualization
+  - Prerequisite knowledge identification and verification system
+  - Progressive difficulty curve optimization
+  - Learning path branching for different skill levels and backgrounds
+
+### 🛠️ **Technical Implementation Specifications**
+- **Backend API**: Complete REST endpoints for course CRUD operations
+- **Database Schema**: Optimized PostgreSQL schema with proper indexing
+- **Frontend Components**: React-based drag & drop interface with real-time updates
+- **AI Integration**: Seamless connection with existing Architect Agent
+- **Performance**: Sub-second response times for structure operations
+
+### 📈 **Success Metrics & KPIs**
+- **Efficiency**: 70%+ reduction in course creation time
+- **Adoption**: 80%+ template usage rate for new courses  
+- **Quality**: 85%+ user satisfaction with AI-generated structures
+- **Accuracy**: Duration estimates within 15% of actual completion times
+
+---
+
 ## 📋 **Development Milestones**
 
 ### ✅ **Completed Phases**

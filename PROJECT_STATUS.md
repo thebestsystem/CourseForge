@@ -89,10 +89,27 @@ Phase 5: ░░░░░░░░░░░░░░░░░░░░░░░�
 
 #### **🎓 Module C - Course Planner** (Recommended Next)
 **Why Priority:** Natural progression from Document Manager
-- Visual course structure builder
-- AI-powered course generation from documents
-- Template library system
-- Hierarchical organization (courses → chapters → sections)
+
+**🏗️ Visual Course Structure Builder:**
+- Interactive drag & drop interface for organizing course elements
+- Hierarchical organization: Cours → Modules → Chapitres → Leçons  
+- Real-time preview with visual course tree
+- Flexible reordering and nesting capabilities
+- Professional templates (Business, Tech, Education, Creative)
+
+**🤖 AI-Powered Course Generation:**
+- Intelligent document analysis from uploaded files
+- Architect Agent integration for optimal structure proposals
+- Smart content distribution into digestible sections
+- Learning path optimization for maximum retention
+- Automatic prerequisite mapping and dependency tracking
+
+**📊 Advanced Planning Features:**
+- AI-powered duration estimation based on content complexity
+- SMART learning objectives generation with Bloom's taxonomy
+- Competency sequencing with prerequisite management
+- Multi-pace learning options (beginner, intermediate, advanced)
+- Assessment point recommendations and quality metrics
 
 #### **📊 Module G - Presentation Generator** (Quick Win)  
 **Why Good Choice:** High impact, moderate complexity

@@ -64,11 +64,11 @@ CourseForge is a **comprehensive SaaS platform** that revolutionizes course crea
 
 ## 🎯 **Coming Soon - Available Modules**
 
-### **🎓 Module C - Course Planner**
-- Visual course structure builder
-- AI-powered course generation  
-- Predefined templates library
-- Hierarchical organization
+### **🎓 Module C - Course Planner** 🚧 *Next Priority*
+- **🏗️ Visual Course Builder**: Drag & drop interface, hierarchical organization (Cours → Modules → Chapitres → Leçons)
+- **📚 Professional Templates**: Business, Technology, Education, Creative pre-built structures
+- **🤖 AI-Powered Generation**: Document analysis, Architect Agent integration, smart content distribution
+- **📊 Advanced Planning**: Duration estimation, SMART objectives, competency sequencing, prerequisite mapping
 
 ### **✏️ Module E - Content Editor**
 - Advanced WYSIWYG editor with AI integration
