@@ -1,0 +1,298 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+    
+    /* Custom CourseForge colors */
+    --courseforge-primary: 263 70% 50%;
+    --courseforge-secondary: 310 50% 45%;
+    --courseforge-accent: 45 100% 55%;
+    --courseforge-success: 120 50% 45%;
+    --courseforge-warning: 30 100% 55%;
+    --courseforge-error: 0 70% 55%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-secondary;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/20 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/40;
+}
+
+/* Loading animations */
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Editor styles */
+.ProseMirror {
+  outline: none;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid hsl(var(--border));
+  min-height: 200px;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: hsl(var(--muted-foreground));
+  pointer-events: none;
+  height: 0;
+}
+
+.ProseMirror .collaboration-cursor__caret {
+  border-left: 1px solid #0d0d0d;
+  border-right: 1px solid #0d0d0d;
+  margin-left: -1px;
+  margin-right: -1px;
+  pointer-events: none;
+  position: relative;
+  word-break: normal;
+}
+
+.ProseMirror .collaboration-cursor__label {
+  border-radius: 3px 3px 3px 0;
+  color: #0d0d0d;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  left: -1px;
+  line-height: normal;
+  padding: 0.1rem 0.3rem;
+  position: absolute;
+  top: -1.4em;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* AI Agent indicators */
+.ai-agent-indicator {
+  @apply inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full;
+}
+
+.ai-agent-architect {
+  @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200;
+}
+
+.ai-agent-research {
+  @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200;
+}
+
+.ai-agent-writing {
+  @apply bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200;
+}
+
+.ai-agent-editing {
+  @apply bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200;
+}
+
+.ai-agent-design {
+  @apply bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200;
+}
+
+.ai-agent-quality {
+  @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200;
+}
+
+.ai-agent-marketing {
+  @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200;
+}
+
+/* Course progress indicators */
+.progress-ring-circle {
+  transition: stroke-dasharray 0.35s;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+/* File upload area */
+.upload-area {
+  @apply border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center transition-colors;
+}
+
+.upload-area.drag-active {
+  @apply border-primary bg-primary/5;
+}
+
+/* Video player styles */
+.video-player {
+  @apply relative w-full aspect-video bg-black rounded-lg overflow-hidden;
+}
+
+.video-controls {
+  @apply absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4;
+}
+
+/* Presentation slide styles */
+.slide-container {
+  @apply w-full aspect-[16/9] bg-white rounded-lg shadow-lg overflow-hidden;
+}
+
+.slide-element {
+  @apply absolute cursor-pointer;
+}
+
+.slide-element:hover {
+  @apply ring-2 ring-primary ring-opacity-50;
+}
+
+.slide-element.selected {
+  @apply ring-2 ring-primary;
+}
+
+/* Timeline styles for video editing */
+.timeline-track {
+  @apply relative w-full h-12 bg-muted rounded-md overflow-hidden;
+}
+
+.timeline-clip {
+  @apply absolute h-full rounded cursor-move;
+}
+
+.timeline-clip.audio {
+  @apply bg-green-500;
+}
+
+.timeline-clip.video {
+  @apply bg-blue-500;
+}
+
+.timeline-clip.text {
+  @apply bg-purple-500;
+}
+
+.timeline-clip.overlay {
+  @apply bg-orange-500;
+}
+
+/* Analytics chart styles */
+.chart-container {
+  @apply w-full h-64 p-4;
+}
+
+.chart-tooltip {
+  @apply bg-popover border border-border rounded-md p-2 shadow-md;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .container {
+    @apply px-4;
+  }
+  
+  .slide-container {
+    @apply aspect-[4/3];
+  }
+  
+  .timeline-track {
+    @apply h-8;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-break {
+    page-break-after: always;
+  }
+}
