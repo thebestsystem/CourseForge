@@ -1,8 +1,17 @@
 import OpenAI from 'openai'
-import { logger } from '@/utils/logger'
-import { redis } from '@/config/redis'
-import { prisma } from '@/config/database'
-import { AIAgentType, AIExecutionStatus } from '@prisma/client'
+import { redis } from '@/config/redis-mock'
+import { prisma } from '@/config/database-simple'
+
+// Simple console logger for development
+const logger = {
+  info: (...args: any[]) => console.log('[INFO]', ...args),
+  warn: (...args: any[]) => console.warn('[WARN]', ...args),
+  error: (...args: any[]) => console.error('[ERROR]', ...args),
+  debug: (...args: any[]) => console.log('[DEBUG]', ...args),
+}
+// Using string types since we're using simplified schema without enums
+type AIAgentType = 'ARCHITECT' | 'RESEARCH' | 'WRITING' | 'EDITING' | 'DESIGN' | 'QUALITY' | 'MARKETING'
+type AIExecutionStatus = 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELED'
 
 // AI Model Providers
 export enum AIProvider {
@@ -85,12 +94,12 @@ export class AIEngine {
         agentType: request.agentType,
         courseId: request.courseId,
         userId: request.userId,
-        input: {
+        input: JSON.stringify({
           prompt: request.prompt,
           context: request.context || {},
           modelConfig: { ...this.defaultConfig, ...request.modelConfig },
-        },
-        status: AIExecutionStatus.RUNNING,
+        }),
+        status: 'RUNNING',
       },
     })
 
@@ -132,12 +141,12 @@ export class AIEngine {
       await prisma.aIAgentExecution.update({
         where: { id: execution.id },
         data: {
-          output: {
+          output: JSON.stringify({
             content: result.content,
             usage: result.usage,
             metadata: result.metadata,
-          },
-          status: AIExecutionStatus.COMPLETED,
+          }),
+          status: 'COMPLETED',
           completedAt: new Date(),
           duration,
           cost: result.cost,
@@ -165,7 +174,7 @@ export class AIEngine {
       await prisma.aIAgentExecution.update({
         where: { id: execution.id },
         data: {
-          status: AIExecutionStatus.FAILED,
+          status: 'FAILED',
           completedAt: new Date(),
           duration: Date.now() - startTime,
         },
@@ -344,8 +353,8 @@ export class AIEngine {
 
     const stats = {
       totalExecutions: executions.length,
-      successfulExecutions: executions.filter(e => e.status === AIExecutionStatus.COMPLETED).length,
-      failedExecutions: executions.filter(e => e.status === AIExecutionStatus.FAILED).length,
+      successfulExecutions: executions.filter(e => e.status === 'COMPLETED').length,
+      failedExecutions: executions.filter(e => e.status === 'FAILED').length,
       totalCost: executions.reduce((sum, e) => sum + (e.cost || 0), 0),
       averageDuration: executions.length > 0 
         ? executions.reduce((sum, e) => sum + (e.duration || 0), 0) / executions.length 
@@ -412,7 +421,7 @@ export class AIEngine {
         startedAt: {
           gte: startOfMonth,
         },
-        status: AIExecutionStatus.COMPLETED,
+        status: 'COMPLETED',
       },
     })
 
