@@ -1,0 +1,471 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// User Management
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  firstName String
+  lastName  String
+  password  String
+  role      UserRole @default(EDUCATOR)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  profile      UserProfile?
+  organization OrganizationMember?
+  subscription Subscription?
+  courses      Course[]
+  documents    Document[]
+  aiExecutions AIAgentExecution[]
+  sessions     UserSession[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  STUDENT
+  EDUCATOR
+  ADMIN
+  SUPER_ADMIN
+}
+
+model UserProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  bio         String?
+  avatar      String?
+  expertise   String[]
+  languages   String[]
+  timezone    String?
+  preferences Json     @default("{}")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  type      OrganizationType
+  logo      String?
+  website   String?
+  settings  Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  members OrganizationMember[]
+  courses Course[]
+
+  @@map("organizations")
+}
+
+enum OrganizationType {
+  SCHOOL
+  UNIVERSITY
+  CORPORATE
+  INDIVIDUAL
+}
+
+model OrganizationMember {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  organizationId String
+  role           UserRole @default(EDUCATOR)
+  joinedAt       DateTime @default(now())
+
+  // Relations
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("organization_members")
+}
+
+model Subscription {
+  id                  String            @id @default(cuid())
+  userId              String            @unique
+  plan                SubscriptionPlan  @default(FREE)
+  status              SubscriptionStatus @default(ACTIVE)
+  currentPeriodStart  DateTime
+  currentPeriodEnd    DateTime
+  stripeSubscriptionId String?           @unique
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+enum SubscriptionPlan {
+  FREE
+  BASIC
+  PRO
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  TRIALING
+}
+
+model UserSession {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_sessions")
+}
+
+// Course Management
+model Course {
+  id             String           @id @default(cuid())
+  title          String
+  description    String
+  thumbnail      String?
+  authorId       String
+  organizationId String?
+  status         CourseStatus     @default(DRAFT)
+  visibility     CourseVisibility @default(PRIVATE)
+  settings       Json             @default("{}")
+  metadata       Json             @default("{}")
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  // Relations
+  author       User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  chapters     Chapter[]
+  documents    Document[]
+  aiExecutions AIAgentExecution[]
+  presentations Presentation[]
+  videoProjects VideoProject[]
+
+  @@map("courses")
+}
+
+enum CourseStatus {
+  DRAFT
+  IN_PROGRESS
+  REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+enum CourseVisibility {
+  PRIVATE
+  INTERNAL
+  PUBLIC
+}
+
+model Chapter {
+  id          String   @id @default(cuid())
+  courseId    String
+  title       String
+  description String?
+  order       Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  course   Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  sections Section[]
+
+  @@map("chapters")
+}
+
+model Section {
+  id          String   @id @default(cuid())
+  chapterId   String
+  title       String
+  description String?
+  order       Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  chapter Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  lessons Lesson[]
+
+  @@map("sections")
+}
+
+model Lesson {
+  id          String     @id @default(cuid())
+  sectionId   String
+  title       String
+  description String?
+  order       Int
+  type        LessonType @default(TEXT)
+  content     Json       @default("{}")
+  duration    Int?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  section   Section           @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  resources LessonResource[]
+
+  @@map("lessons")
+}
+
+enum LessonType {
+  TEXT
+  VIDEO
+  AUDIO
+  PRESENTATION
+  INTERACTIVE
+  QUIZ
+  ASSIGNMENT
+}
+
+model LessonResource {
+  id        String   @id @default(cuid())
+  lessonId  String
+  name      String
+  type      String
+  url       String
+  size      Int?
+  mimeType  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@map("lesson_resources")
+}
+
+// Document Management
+model Document {
+  id           String         @id @default(cuid())
+  name         String
+  originalName String
+  type         DocumentType
+  size         Int
+  mimeType     String
+  url          String
+  thumbnailUrl String?
+  ownerId      String
+  courseId     String?
+  status       DocumentStatus @default(UPLOADING)
+  metadata     Json           @default("{}")
+  content      Json?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  // Relations
+  owner  User    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  course Course? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+
+  @@map("documents")
+}
+
+enum DocumentType {
+  PDF
+  DOCX
+  DOC
+  TXT
+  MD
+  IMAGE
+  VIDEO
+  AUDIO
+}
+
+enum DocumentStatus {
+  UPLOADING
+  PROCESSING
+  READY
+  ERROR
+}
+
+// AI Agents System
+model AIAgent {
+  id           String      @id @default(cuid())
+  type         AIAgentType @unique
+  name         String
+  description  String
+  capabilities String[]
+  systemPrompt String
+  model        String      @default("gpt-4")
+  temperature  Float       @default(0.7)
+  maxTokens    Int         @default(2000)
+  isEnabled    Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  // Relations
+  executions AIAgentExecution[]
+
+  @@map("ai_agents")
+}
+
+enum AIAgentType {
+  ARCHITECT
+  RESEARCH
+  WRITING
+  EDITING
+  DESIGN
+  QUALITY
+  MARKETING
+}
+
+model AIAgentExecution {
+  id          String            @id @default(cuid())
+  agentType   AIAgentType
+  courseId    String?
+  userId      String
+  input       Json
+  output      Json?
+  status      AIExecutionStatus @default(PENDING)
+  startedAt   DateTime          @default(now())
+  completedAt DateTime?
+  duration    Int?
+  cost        Float?
+
+  // Relations
+  agent  AIAgent @relation(fields: [agentType], references: [type])
+  course Course? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ai_agent_executions")
+}
+
+enum AIExecutionStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELED
+}
+
+// Presentation System
+model Presentation {
+  id        String   @id @default(cuid())
+  courseId  String
+  title     String
+  template  Json     @default("{}")
+  slides    Json     @default("[]")
+  settings  Json     @default("{}")
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@map("presentations")
+}
+
+// Video Studio
+model VideoProject {
+  id        String             @id @default(cuid())
+  courseId  String
+  title     String
+  script    Json               @default("{}")
+  timeline  Json               @default("{}")
+  settings  Json               @default("{}")
+  status    VideoProjectStatus @default(DRAFT)
+  outputUrl String?
+  metadata  Json               @default("{}")
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  // Relations
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@map("video_projects")
+}
+
+enum VideoProjectStatus {
+  DRAFT
+  GENERATING
+  READY
+  ERROR
+}
+
+// System Configuration
+model SystemConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("system_config")
+}
+
+// Analytics
+model AnalyticsEvent {
+  id         String   @id @default(cuid())
+  userId     String?
+  courseId   String?
+  eventType  String
+  eventData  Json     @default("{}")
+  sessionId  String?
+  ipAddress  String?
+  userAgent  String?
+  timestamp  DateTime @default(now())
+
+  @@map("analytics_events")
+}
+
+// Billing
+model Invoice {
+  id                 String        @id @default(cuid())
+  userId             String
+  stripeInvoiceId    String        @unique
+  subscriptionId     String?
+  amount             Int
+  currency           String        @default("usd")
+  status             InvoiceStatus
+  paidAt             DateTime?
+  dueDate            DateTime
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  @@map("invoices")
+}
+
+enum InvoiceStatus {
+  DRAFT
+  OPEN
+  PAID
+  VOID
+  UNCOLLECTIBLE
+}
+
+model UsageRecord {
+  id         String    @id @default(cuid())
+  userId     String
+  resourceType String
+  quantity   Int
+  timestamp  DateTime  @default(now())
+  metadata   Json      @default("{}")
+
+  @@map("usage_records")
+}

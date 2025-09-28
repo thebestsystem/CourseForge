@@ -1,16 +1,26 @@
 import { Request, Response } from 'express'
-import { prisma } from '@/config/database'
+import { prisma } from '@/config/database-simple'
 import { aiEngine } from '@/services/ai-engine'
-import { logger } from '@/utils/logger'
-import { AIAgentType, AIExecutionStatus } from '@prisma/client'
+
+// Simple console logger for development
+const logger = {
+  info: (...args: any[]) => console.log('[INFO]', ...args),
+  warn: (...args: any[]) => console.warn('[WARN]', ...args),
+  error: (...args: any[]) => console.error('[ERROR]', ...args),
+  debug: (...args: any[]) => console.log('[DEBUG]', ...args),
+}
+// Using string types since we're using simplified schema without enums
+type AIAgentType = 'ARCHITECT' | 'RESEARCH' | 'WRITING' | 'EDITING' | 'DESIGN' | 'QUALITY' | 'MARKETING'
+type AIExecutionStatus = 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELED'
 import { z } from 'zod'
 
 // Validation schemas
 const executeAgentSchema = z.object({
-  agentType: z.nativeEnum(AIAgentType),
+  agentType: z.enum(['ARCHITECT', 'RESEARCH', 'WRITING', 'EDITING', 'DESIGN', 'QUALITY', 'MARKETING']),
   prompt: z.string().min(1, 'Prompt is required').max(5000, 'Prompt too long'),
   context: z.record(z.any()).optional(),
   courseId: z.string().uuid().optional(),
+  provider: z.string().optional(), // LLM provider to use (openai, deepseek, etc.)
   modelConfig: z.object({
     model: z.string().optional(),
     temperature: z.number().min(0).max(2).optional(),
@@ -20,7 +30,7 @@ const executeAgentSchema = z.object({
 
 const getExecutionHistorySchema = z.object({
   courseId: z.string().uuid().optional(),
-  agentType: z.nativeEnum(AIAgentType).optional(),
+  agentType: z.enum(['ARCHITECT', 'RESEARCH', 'WRITING', 'EDITING', 'DESIGN', 'QUALITY', 'MARKETING']).optional(),
   limit: z.string().transform(val => parseInt(val) || 50).optional(),
   page: z.string().transform(val => parseInt(val) || 1).optional(),
 })
@@ -86,7 +96,8 @@ export class AIAgentsController {
     try {
       const { type } = req.params
       
-      if (!Object.values(AIAgentType).includes(type as AIAgentType)) {
+      const validTypes = ['ARCHITECT', 'RESEARCH', 'WRITING', 'EDITING', 'DESIGN', 'QUALITY', 'MARKETING']
+      if (!validTypes.includes(type as AIAgentType)) {
         return res.status(400).json({
           success: false,
           message: 'Invalid agent type',
@@ -100,7 +111,7 @@ export class AIAgentsController {
             select: {
               executions: {
                 where: {
-                  status: AIExecutionStatus.COMPLETED,
+                  status: 'COMPLETED',
                 },
               },
             },
@@ -386,7 +397,8 @@ export class AIAgentsController {
 
       const { type } = req.params
       
-      if (!Object.values(AIAgentType).includes(type as AIAgentType)) {
+      const validTypes = ['ARCHITECT', 'RESEARCH', 'WRITING', 'EDITING', 'DESIGN', 'QUALITY', 'MARKETING']
+      if (!validTypes.includes(type as AIAgentType)) {
         return res.status(400).json({
           success: false,
           message: 'Invalid agent type',
@@ -444,7 +456,7 @@ export class AIAgentsController {
         where: { 
           id,
           userId,
-          status: AIExecutionStatus.RUNNING,
+          status: 'RUNNING',
         },
       })
 
@@ -459,7 +471,7 @@ export class AIAgentsController {
       await prisma.aIAgentExecution.update({
         where: { id },
         data: {
-          status: AIExecutionStatus.FAILED,
+          status: 'FAILED',
           completedAt: new Date(),
           duration: Date.now() - execution.startedAt.getTime(),
         },

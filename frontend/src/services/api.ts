@@ -244,6 +244,16 @@ export const API_ENDPOINTS = {
     INVOICES: '/api/billing/invoices',
     USAGE: '/api/billing/usage',
   },
+
+  // Settings
+  SETTINGS: {
+    BASE: '/api/settings',
+    PROVIDERS: '/api/settings/providers',
+    API_KEYS: '/api/settings/api-keys',
+    ADD_API_KEY: '/api/settings/api-keys',
+    REMOVE_API_KEY: (provider: string) => `/api/settings/api-keys/${provider}`,
+    TEST_API_KEY: (provider: string) => `/api/settings/api-keys/${provider}/test`,
+  },
 }
 
 export default apiClient
