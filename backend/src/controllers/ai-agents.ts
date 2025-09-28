@@ -20,6 +20,7 @@ const executeAgentSchema = z.object({
   prompt: z.string().min(1, 'Prompt is required').max(5000, 'Prompt too long'),
   context: z.record(z.any()).optional(),
   courseId: z.string().uuid().optional(),
+  provider: z.string().optional(), // LLM provider to use (openai, deepseek, etc.)
   modelConfig: z.object({
     model: z.string().optional(),
     temperature: z.number().min(0).max(2).optional(),

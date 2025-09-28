@@ -27,6 +27,7 @@ model User {
   documentTags    DocumentTag[]
   executions      AIAgentExecution[]
   subscription    Subscription?
+  settings        UserSettings?
 
   @@map("users")
 }
@@ -105,7 +106,7 @@ model Document {
   owner  User    @relation(fields: [ownerId], references: [id])
   course Course? @relation(fields: [courseId], references: [id])
   folder DocumentFolder? @relation(fields: [folderId], references: [id])
-  tags   DocumentTag[]
+  tagRelations DocumentTagRelation[]
 
   @@map("documents")
 }
@@ -140,8 +141,8 @@ model DocumentTag {
   createdAt  DateTime @default(now())
 
   // Relations
-  owner     User       @relation(fields: [ownerId], references: [id])
-  documents Document[] @relation("DocumentTags")
+  owner        User                    @relation(fields: [ownerId], references: [id])
+  tagRelations DocumentTagRelation[]
 
   @@unique([name, ownerId]) // Unique tag names per user
   @@map("document_tags")
@@ -152,7 +153,7 @@ model DocumentTagRelation {
   documentId String
   tagId      String
 
-  document Document    @relation("DocumentTags", fields: [documentId], references: [id])
+  document Document    @relation(fields: [documentId], references: [id])
   tag      DocumentTag @relation(fields: [tagId], references: [id])
 
   @@id([documentId, tagId])
@@ -200,4 +201,36 @@ model AIAgentExecution {
   user   User    @relation(fields: [userId], references: [id])
 
   @@map("ai_agent_executions")
+}
+
+// User Settings for API Keys and LLM Configurations
+model UserSettings {
+  id       String   @id @default(cuid())
+  userId   String   @unique
+  settings String   // JSON string containing encrypted API keys and preferences
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_settings")
+}
+
+// LLM Provider Configurations
+model LLMProvider {
+  id           String   @id @default(cuid())
+  name         String   @unique // openai, deepseek, claude, gemini, etc.
+  displayName  String   // "OpenAI GPT-4", "DeepSeek Chat", etc.
+  baseUrl      String?  // API base URL (for custom endpoints)
+  models       String   // JSON array of available models
+  pricing      String?  // JSON object with pricing info
+  features     String   // JSON array of supported features
+  authType     String   // API_KEY, BEARER_TOKEN, etc.
+  isEnabled    Boolean  @default(true)
+  isDefault    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("llm_providers")
 }

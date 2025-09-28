@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CourseForge AI - Dashboard Complet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        .sidebar-transition { transition: width 0.3s ease-in-out; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        .slide-up { animation: slideUp 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .agent-card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .provider-card:hover { transform: scale(1.02); }
+        .glass-effect { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.9); }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        accent: '#F59E0B'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Sidebar -->
+    <div id="sidebar" class="fixed left-0 top-0 h-full w-64 bg-white shadow-lg z-40 sidebar-transition">
+        <div class="p-6 border-b">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                    <i data-lucide="book-open" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900">CourseForge</h1>
+                    <p class="text-sm text-gray-500">AI Course Creator</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="mt-6">
+            <div class="px-6 mb-6">
+                <div class="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+                    <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-sm font-medium">
+                        U
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium">Utilisateur Test</p>
+                        <p class="text-xs text-gray-500">Plan PRO</p>
+                    </div>
+                </div>
+            </div>
+
+            <ul class="space-y-2 px-3">
+                <li><a href="#dashboard" onclick="showPage('dashboard')" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    <span>Dashboard</span>
+                </a></li>
+                
+                <li><a href="#ai-agents" onclick="showPage('ai-agents')" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                    <i data-lucide="bot" class="w-5 h-5"></i>
+                    <span>Agents IA</span>
+                    <span class="ml-auto bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">7</span>
+                </a></li>
+                
+                <li><a href="#courses" onclick="showPage('courses')" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                    <i data-lucide="book" class="w-5 h-5"></i>
+                    <span>Cours</span>
+                    <span class="ml-auto bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">12</span>
+                </a></li>
+                
+                <li><a href="#documents" onclick="showPage('documents')" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                    <i data-lucide="file-text" class="w-5 h-5"></i>
+                    <span>Documents</span>
+                    <span class="ml-auto bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">89</span>
+                </a></li>
+                
+                <li><a href="#settings" onclick="showPage('settings')" class="nav-item flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
+                    <span>Paramètres</span>
+                </a></li>
+            </ul>
+
+            <div class="mt-8 px-3">
+                <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-4">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <i data-lucide="zap" class="w-4 h-4 text-yellow-500"></i>
+                        <span class="text-sm font-medium">Agents IA Rapides</span>
+                    </div>
+                    <div class="space-y-2">
+                        <button onclick="quickExecute('ARCHITECT')" class="w-full text-left p-2 text-xs rounded hover:bg-white hover:shadow transition-all">
+                            🏗️ Architecte - Structure de cours
+                        </button>
+                        <button onclick="quickExecute('WRITING')" class="w-full text-left p-2 text-xs rounded hover:bg-white hover:shadow transition-all">
+                            ✍️ Rédacteur - Contenu engageant
+                        </button>
+                        <button onclick="quickExecute('RESEARCH')" class="w-full text-left p-2 text-xs rounded hover:bg-white hover:shadow transition-all">
+                            🔍 Recherche - Vérification des faits
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="ml-64">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <button onclick="toggleSidebar()" class="p-2 rounded-lg hover:bg-gray-100">
+                        <i data-lucide="menu" class="w-5 h-5"></i>
+                    </button>
+                    <div>
+                        <h2 id="page-title" class="text-xl font-semibold text-gray-900">Dashboard</h2>
+                        <p id="page-subtitle" class="text-sm text-gray-500">Vue d'ensemble de votre plateforme IA</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button class="relative p-2 rounded-lg hover:bg-gray-100">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+                    </button>
+                    
+                    <div class="flex items-center space-x-2 text-sm">
+                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span class="text-gray-600">API Connectée</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="p-6">
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="page-content">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow p-6 slide-up">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Agents IA</p>
+                                <p class="text-3xl font-bold text-gray-900">7</p>
+                                <p class="text-sm text-green-600">+2 ce mois</p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="bot" class="w-6 h-6 text-blue-600"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6 slide-up" style="animation-delay: 0.1s">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Cours Créés</p>
+                                <p class="text-3xl font-bold text-gray-900">24</p>
+                                <p class="text-sm text-green-600">+8 cette semaine</p>
+                            </div>
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="book" class="w-6 h-6 text-green-600"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6 slide-up" style="animation-delay: 0.2s">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Tokens Utilisés</p>
+                                <p class="text-3xl font-bold text-gray-900">2.4M</p>
+                                <p class="text-sm text-blue-600">$3.36 économisés</p>
+                            </div>
+                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="zap" class="w-6 h-6 text-purple-600"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6 slide-up" style="animation-delay: 0.3s">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Économies</p>
+                                <p class="text-3xl font-bold text-gray-900">95%</p>
+                                <p class="text-sm text-green-600">vs OpenAI</p>
+                            </div>
+                            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="dollar-sign" class="w-6 h-6 text-yellow-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center space-x-2">
+                            <i data-lucide="plus-circle" class="w-5 h-5 text-blue-600"></i>
+                            <span>Actions Rapides</span>
+                        </h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <button onclick="showPage('ai-agents')" class="flex flex-col items-center p-4 border-2 border-dashed border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all">
+                                <i data-lucide="bot" class="w-8 h-8 text-blue-600 mb-2"></i>
+                                <span class="text-sm font-medium">Nouvel Agent</span>
+                            </button>
+                            <button onclick="showPage('courses')" class="flex flex-col items-center p-4 border-2 border-dashed border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 transition-all">
+                                <i data-lucide="book-plus" class="w-8 h-8 text-green-600 mb-2"></i>
+                                <span class="text-sm font-medium">Nouveau Cours</span>
+                            </button>
+                            <button onclick="showPage('documents')" class="flex flex-col items-center p-4 border-2 border-dashed border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-all">
+                                <i data-lucide="upload" class="w-8 h-8 text-purple-600 mb-2"></i>
+                                <span class="text-sm font-medium">Upload Document</span>
+                            </button>
+                            <button onclick="showPage('settings')" class="flex flex-col items-center p-4 border-2 border-dashed border-gray-200 rounded-lg hover:border-gray-300 hover:bg-gray-50 transition-all">
+                                <i data-lucide="settings" class="w-8 h-8 text-gray-600 mb-2"></i>
+                                <span class="text-sm font-medium">Paramètres</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4 flex items-center space-x-2">
+                            <i data-lucide="trending-up" class="w-5 h-5 text-green-600"></i>
+                            <span>Activité Récente</span>
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i data-lucide="bot" class="w-4 h-4 text-blue-600"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium">Agent Architecte exécuté</p>
+                                    <p class="text-xs text-gray-500">Il y a 2 minutes</p>
+                                </div>
+                                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Succès</span>
+                            </div>
+                            
+                            <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i data-lucide="book" class="w-4 h-4 text-green-600"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium">Cours "Web Dev" créé</p>
+                                    <p class="text-xs text-gray-500">Il y a 1 heure</p>
+                                </div>
+                                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Nouveau</span>
+                            </div>
+                            
+                            <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                                <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                                    <i data-lucide="file-text" class="w-4 h-4 text-purple-600"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium">5 documents uploadés</p>
+                                    <p class="text-xs text-gray-500">Il y a 3 heures</p>
+                                </div>
+                                <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">Documents</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LLM Providers Status -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center space-x-2">
+                        <i data-lucide="brain" class="w-5 h-5 text-purple-600"></i>
+                        <span>Fournisseurs LLM</span>
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="provider-card p-4 border border-green-200 bg-green-50 rounded-lg transition-transform">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-medium">DeepSeek Chat</span>
+                                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Connecté</span>
+                            </div>
+                            <p class="text-sm text-gray-600">$0.14/1M tokens</p>
+                            <div class="mt-2 w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: 75%"></div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Usage: 75%</p>
+                        </div>
+                        
+                        <div class="provider-card p-4 border border-gray-200 rounded-lg transition-transform">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-medium">OpenAI GPT</span>
+                                <span class="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">Disponible</span>
+                            </div>
+                            <p class="text-sm text-gray-600">$10.00/1M tokens</p>
+                            <div class="mt-2 w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-gray-300 h-2 rounded-full" style="width: 0%"></div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Non configuré</p>
+                        </div>
+                        
+                        <div class="provider-card p-4 border border-blue-200 bg-blue-50 rounded-lg transition-transform">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-medium">Google Gemini</span>
+                                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Connecté</span>
+                            </div>
+                            <p class="text-sm text-gray-600">$0.125/1M tokens</p>
+                            <div class="mt-2 w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-blue-500 h-2 rounded-full" style="width: 45%"></div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Usage: 45%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Agents Page -->
+            <div id="ai-agents-page" class="page-content hidden">
+                <div class="mb-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900">Agents IA Spécialisés</h2>
+                            <p class="text-gray-600">Gérez et exécutez vos agents IA pour la création de cours</p>
+                        </div>
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            <i data-lucide="plus" class="w-4 h-4 mr-2 inline"></i>
+                            Nouvel Agent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Agent Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="agent-card bg-white rounded-lg shadow p-6 transition-all duration-200">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <span class="text-xl">🏗️</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900">Architecte de Cours</h3>
+                                <p class="text-sm text-gray-500">Structure et organise</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4">Crée la structure logique et pédagogique de vos cours avec une progression optimale.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Actif</span>
+                            <button onclick="executeAgent('ARCHITECT')" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                                Exécuter →
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="agent-card bg-white rounded-lg shadow p-6 transition-all duration-200">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                <span class="text-xl">🔍</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900">Assistant Recherche</h3>
+                                <p class="text-sm text-gray-500">Collecte et vérifie</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4">Recherche et vérifie les informations pour assurer l'exactitude du contenu éducatif.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Actif</span>
+                            <button onclick="executeAgent('RESEARCH')" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                                Exécuter →
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="agent-card bg-white rounded-lg shadow p-6 transition-all duration-200">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <span class="text-xl">✍️</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900">Rédacteur de Contenu</h3>
+                                <p class="text-sm text-gray-500">Crée et engage</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4">Génère du contenu engageant et pédagogique adapté à votre audience cible.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Actif</span>
+                            <button onclick="executeAgent('WRITING')" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                                Exécuter →
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="agent-card bg-white rounded-lg shadow p-6 transition-all duration-200">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                <span class="text-xl">📝</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900">Éditeur de Contenu</h3>
+                                <p class="text-sm text-gray-500">Améliore et polit</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4">Révise et améliore le contenu existant pour une qualité optimale.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Actif</span>
+                            <button onclick="executeAgent('EDITING')" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                                Exécuter →
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="agent-card bg-white rounded-lg shadow p-6 transition-all duration-200">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center">
+                                <span class="text-xl">🎨</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900">Spécialiste Design</h3>
+                                <p class="text-sm text-gray-500">Visualise et optimise</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4">Propose des améliorations visuelles et d'expérience utilisateur pour vos cours.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Actif</span>
+                            <button onclick="executeAgent('DESIGN')" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                                Exécuter →
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="agent-card bg-white rounded-lg shadow p-6 transition-all duration-200">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                                <span class="text-xl">🛡️</span>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900">Assurance Qualité</h3>
+                                <p class="text-sm text-gray-500">Contrôle et valide</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4">Vérifie la qualité, cohérence et respect des standards éducatifs.</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Actif</span>
+                            <button onclick="executeAgent('QUALITY')" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                                Exécuter →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Execution Panel -->
+                <div id="ai-execution-panel" class="mt-8 bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center space-x-2">
+                        <i data-lucide="play-circle" class="w-5 h-5 text-blue-600"></i>
+                        <span>Exécution d'Agent IA</span>
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Agent Sélectionné</label>
+                                    <select id="agent-select" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="">Choisir un agent</option>
+                                        <option value="ARCHITECT">🏗️ Architecte de Cours</option>
+                                        <option value="RESEARCH">🔍 Assistant Recherche</option>
+                                        <option value="WRITING">✍️ Rédacteur de Contenu</option>
+                                        <option value="EDITING">📝 Éditeur de Contenu</option>
+                                        <option value="DESIGN">🎨 Spécialiste Design</option>
+                                        <option value="QUALITY">🛡️ Assurance Qualité</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Fournisseur LLM</label>
+                                    <select id="provider-select" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="">Utiliser le défaut</option>
+                                        <option value="deepseek">DeepSeek Chat ($0.14/1M)</option>
+                                        <option value="openai">OpenAI GPT ($10/1M)</option>
+                                        <option value="gemini">Google Gemini ($0.125/1M)</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Prompt</label>
+                                    <textarea id="prompt-input" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Décrivez ce que vous voulez que l'agent IA crée..."></textarea>
+                                </div>
+
+                                <button onclick="executeAIAgent()" id="execute-button" class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50">
+                                    <i data-lucide="play" class="w-4 h-4 mr-2 inline"></i>
+                                    Exécuter l'Agent IA
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="bg-gray-50 rounded-lg p-4 h-full">
+                                <h4 class="font-medium text-gray-900 mb-3">Résultat</h4>
+                                <div id="execution-result" class="text-sm text-gray-500">
+                                    Sélectionnez un agent et entrez un prompt pour voir le résultat...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="settings-page" class="page-content hidden">
+                <!-- Content will be loaded from the existing demo -->
+                <div class="text-center py-8">
+                    <i data-lucide="settings" class="w-16 h-16 text-gray-400 mx-auto mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Paramètres Avancés</h3>
+                    <p class="text-gray-500 mb-4">Pour accéder aux paramètres complets, utilisez le lien ci-dessous :</p>
+                    <a href="demo-settings-ui.html" target="_blank" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        <i data-lucide="external-link" class="w-4 h-4 mr-2"></i>
+                        Ouvrir les Paramètres Complets
+                    </a>
+                </div>
+            </div>
+
+            <!-- Other pages placeholder -->
+            <div id="courses-page" class="page-content hidden">
+                <div class="text-center py-12">
+                    <i data-lucide="book" class="w-16 h-16 text-gray-400 mx-auto mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Gestion des Cours</h3>
+                    <p class="text-gray-500">Module en cours de développement...</p>
+                </div>
+            </div>
+
+            <div id="documents-page" class="page-content hidden">
+                <!-- Document Manager Header -->
+                <div class="mb-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900 flex items-center space-x-3">
+                                <i data-lucide="folder" class="w-8 h-8 text-blue-600"></i>
+                                <span>Gestionnaire de Documents</span>
+                            </h2>
+                            <p class="text-gray-600 mt-1">Uploadez, organisez et analysez vos documents pour créer du contenu éducatif</p>
+                        </div>
+                        <div class="mt-4 sm:mt-0 flex space-x-3">
+                            <button onclick="showUploadModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2">
+                                <i data-lucide="upload" class="w-4 h-4"></i>
+                                <span>Nouveau Document</span>
+                            </button>
+                            <button onclick="bulkAnalyze()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2">
+                                <i data-lucide="zap" class="w-4 h-4"></i>
+                                <span>Analyse Groupée</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Documents Total</p>
+                                <p class="text-3xl font-bold text-blue-600" id="total-documents">12</p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="file-text" class="w-6 h-6 text-blue-600"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex items-center text-sm">
+                            <span class="text-green-600 flex items-center">
+                                <i data-lucide="trending-up" class="w-4 h-4 mr-1"></i>
+                                +2 cette semaine
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Contenu Extrait</p>
+                                <p class="text-3xl font-bold text-green-600" id="extracted-content">8</p>
+                            </div>
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="search" class="w-6 h-6 text-green-600"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex items-center text-sm">
+                            <span class="text-blue-600 flex items-center">
+                                <i data-lucide="zap" class="w-4 h-4 mr-1"></i>
+                                67% traité
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Taille Totale</p>
+                                <p class="text-3xl font-bold text-purple-600" id="total-size">247MB</p>
+                            </div>
+                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="hard-drive" class="w-6 h-6 text-purple-600"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex items-center text-sm">
+                            <span class="text-purple-600 flex items-center">
+                                <i data-lucide="database" class="w-4 h-4 mr-1"></i>
+                                5GB limite
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Cours Générés</p>
+                                <p class="text-3xl font-bold text-orange-600" id="courses-generated">3</p>
+                            </div>
+                            <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="book-open" class="w-6 h-6 text-orange-600"></i>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex items-center text-sm">
+                            <span class="text-orange-600 flex items-center">
+                                <i data-lucide="graduation-cap" class="w-4 h-4 mr-1"></i>
+                                Basés sur docs
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search and Filters -->
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+                        <div class="flex-1 max-w-lg">
+                            <div class="relative">
+                                <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                                <input type="text" id="document-search" placeholder="Rechercher dans les documents..." class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-3">
+                            <select id="document-filter-type" class="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="all">Tous les types</option>
+                                <option value="pdf">PDF</option>
+                                <option value="docx">DOCX</option>
+                                <option value="image">Images</option>
+                                <option value="video">Vidéos</option>
+                            </select>
+                            
+                            <select id="document-filter-status" class="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="all">Tous les statuts</option>
+                                <option value="processing">En traitement</option>
+                                <option value="completed">Traité</option>
+                                <option value="error">Erreur</option>
+                            </select>
+                            
+                            <button onclick="refreshDocuments()" class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 transition-colors">
+                                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documents Grid -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold text-gray-900">Mes Documents</h3>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="toggleView('grid')" id="grid-view-btn" class="p-2 rounded-lg bg-blue-100 text-blue-600">
+                                    <i data-lucide="grid-3x3" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="toggleView('list')" id="list-view-btn" class="p-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                                    <i data-lucide="list" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Grid View -->
+                        <div id="documents-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            <!-- Sample Documents -->
+                            <div class="document-card border-2 border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer" onclick="openDocument('doc1')">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                                        <i data-lucide="file-text" class="w-6 h-6 text-red-600"></i>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <button onclick="event.stopPropagation(); analyzeDocument('doc1')" class="p-1 text-blue-600 hover:bg-blue-100 rounded">
+                                            <i data-lucide="zap" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="event.stopPropagation(); downloadDocument('doc1')" class="p-1 text-gray-600 hover:bg-gray-100 rounded">
+                                            <i data-lucide="download" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="event.stopPropagation(); deleteDocument('doc1')" class="p-1 text-red-600 hover:bg-red-100 rounded">
+                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <h4 class="font-medium text-gray-900 mb-2 truncate">Guide Marketing Digital.pdf</h4>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <p>2.1 MB • PDF</p>
+                                    <p>Uploadé il y a 2 jours</p>
+                                    <div class="flex items-center">
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                                            <i data-lucide="check" class="w-3 h-3 mr-1"></i>
+                                            Traité
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="document-card border-2 border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer" onclick="openDocument('doc2')">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                        <i data-lucide="file-text" class="w-6 h-6 text-blue-600"></i>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <button onclick="event.stopPropagation(); analyzeDocument('doc2')" class="p-1 text-blue-600 hover:bg-blue-100 rounded">
+                                            <i data-lucide="zap" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="event.stopPropagation(); downloadDocument('doc2')" class="p-1 text-gray-600 hover:bg-gray-100 rounded">
+                                            <i data-lucide="download" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="event.stopPropagation(); deleteDocument('doc2')" class="p-1 text-red-600 hover:bg-red-100 rounded">
+                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <h4 class="font-medium text-gray-900 mb-2 truncate">Présentation Stratégie.pptx</h4>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <p>5.4 MB • PPTX</p>
+                                    <p>Uploadé il y a 1 semaine</p>
+                                    <div class="flex items-center">
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
+                                            <i data-lucide="clock" class="w-3 h-3 mr-1"></i>
+                                            En cours
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="document-card border-2 border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer" onclick="openDocument('doc3')">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                        <i data-lucide="image" class="w-6 h-6 text-purple-600"></i>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <button onclick="event.stopPropagation(); analyzeDocument('doc3')" class="p-1 text-blue-600 hover:bg-blue-100 rounded">
+                                            <i data-lucide="zap" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="event.stopPropagation(); downloadDocument('doc3')" class="p-1 text-gray-600 hover:bg-gray-100 rounded">
+                                            <i data-lucide="download" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="event.stopPropagation(); deleteDocument('doc3')" class="p-1 text-red-600 hover:bg-red-100 rounded">
+                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <h4 class="font-medium text-gray-900 mb-2 truncate">Infographie Données.png</h4>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <p>1.2 MB • PNG</p>
+                                    <p>Uploadé il y a 3 jours</p>
+                                    <div class="flex items-center">
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                                            <i data-lucide="check" class="w-3 h-3 mr-1"></i>
+                                            Traité
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="document-card border-2 border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer" onclick="openDocument('doc4')">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                        <i data-lucide="play-circle" class="w-6 h-6 text-green-600"></i>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <button onclick="event.stopPropagation(); analyzeDocument('doc4')" class="p-1 text-blue-600 hover:bg-blue-100 rounded">
+                                            <i data-lucide="zap" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="event.stopPropagation(); downloadDocument('doc4')" class="p-1 text-gray-600 hover:bg-gray-100 rounded">
+                                            <i data-lucide="download" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="event.stopPropagation(); deleteDocument('doc4')" class="p-1 text-red-600 hover:bg-red-100 rounded">
+                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <h4 class="font-medium text-gray-900 mb-2 truncate">Tutoriel Formation.mp4</h4>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <p>45.7 MB • MP4</p>
+                                    <p>Uploadé il y a 5 jours</p>
+                                    <div class="flex items-center">
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">
+                                            <i data-lucide="alert-circle" class="w-3 h-3 mr-1"></i>
+                                            Erreur
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- List View (Hidden by default) -->
+                        <div id="documents-list" class="hidden">
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Document</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Taille</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="flex items-center">
+                                                    <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                                                        <i data-lucide="file-text" class="w-4 h-4 text-red-600"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="text-sm font-medium text-gray-900">Guide Marketing Digital.pdf</div>
+                                                        <div class="text-sm text-gray-500">Document de formation</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">PDF</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2.1 MB</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                                                    <i data-lucide="check" class="w-3 h-3 mr-1"></i>
+                                                    Traité
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Il y a 2 jours</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                <div class="flex space-x-2">
+                                                    <button onclick="analyzeDocument('doc1')" class="text-blue-600 hover:text-blue-800">
+                                                        <i data-lucide="zap" class="w-4 h-4"></i>
+                                                    </button>
+                                                    <button onclick="downloadDocument('doc1')" class="text-gray-600 hover:text-gray-800">
+                                                        <i data-lucide="download" class="w-4 h-4"></i>
+                                                    </button>
+                                                    <button onclick="deleteDocument('doc1')" class="text-red-600 hover:text-red-800">
+                                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <!-- More rows... -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 text-center">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p class="text-gray-600">Exécution de l'agent IA...</p>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <script>
+        const API_BASE = 'https://3007-ic3ifp4wllje0oyfwv7fr-6532622b.e2b.dev';
+        let sidebarCollapsed = false;
+
+        // Initialize Lucide icons
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+            
+            // Set active nav item
+            updateActiveNav('dashboard');
+        });
+
+        // Navigation functions
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.add('hidden');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId + '-page').classList.remove('hidden');
+            
+            // Update header
+            const titles = {
+                'dashboard': { title: 'Dashboard', subtitle: 'Vue d\'ensemble de votre plateforme IA' },
+                'ai-agents': { title: 'Agents IA', subtitle: 'Gérez et exécutez vos agents IA spécialisés' },
+                'courses': { title: 'Cours', subtitle: 'Créez et gérez vos cours en ligne' },
+                'documents': { title: 'Documents', subtitle: 'Uploadez et organisez vos ressources' },
+                'settings': { title: 'Paramètres', subtitle: 'Configurez vos préférences et API' }
+            };
+            
+            const pageInfo = titles[pageId] || { title: 'Page', subtitle: 'Description' };
+            document.getElementById('page-title').textContent = pageInfo.title;
+            document.getElementById('page-subtitle').textContent = pageInfo.subtitle;
+            
+            updateActiveNav(pageId);
+        }
+
+        function updateActiveNav(activeId) {
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('bg-blue-100', 'text-blue-700');
+                item.classList.add('text-gray-700');
+            });
+            
+            // Add active class to current item
+            const activeLink = document.querySelector(`a[href="#${activeId}"]`);
+            if (activeLink) {
+                activeLink.classList.remove('text-gray-700');
+                activeLink.classList.add('bg-blue-100', 'text-blue-700');
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.ml-64');
+            
+            if (sidebarCollapsed) {
+                sidebar.style.width = '16rem';
+                mainContent.style.marginLeft = '16rem';
+                sidebarCollapsed = false;
+            } else {
+                sidebar.style.width = '4rem';
+                mainContent.style.marginLeft = '4rem';
+                sidebarCollapsed = true;
+            }
+        }
+
+        // AI Agent functions
+        function executeAgent(agentType) {
+            document.getElementById('agent-select').value = agentType;
+            showPage('ai-agents');
+            
+            // Scroll to execution panel
+            setTimeout(() => {
+                document.getElementById('ai-execution-panel').scrollIntoView({ 
+                    behavior: 'smooth' 
+                });
+            }, 300);
+        }
+
+        function quickExecute(agentType) {
+            const prompts = {
+                'ARCHITECT': 'Créez une structure de cours pour "Introduction au Développement Web"',
+                'WRITING': 'Rédigez une introduction engageante pour un cours sur JavaScript',
+                'RESEARCH': 'Recherchez les dernières tendances en développement web pour 2024'
+            };
+            
+            const prompt = prompts[agentType] || 'Aidez-moi à créer du contenu éducatif';
+            
+            showToast(`Exécution rapide de l'agent ${agentType}...`, 'info');
+            
+            // Simulate quick execution
+            setTimeout(() => {
+                showToast('Agent exécuté avec succès!', 'success');
+            }, 2000);
+        }
+
+        async function executeAIAgent() {
+            const agentType = document.getElementById('agent-select').value;
+            const provider = document.getElementById('provider-select').value;
+            const prompt = document.getElementById('prompt-input').value;
+
+            if (!agentType || !prompt.trim()) {
+                showToast('Veuillez sélectionner un agent et entrer un prompt.', 'error');
+                return;
+            }
+
+            const button = document.getElementById('execute-button');
+            const resultDiv = document.getElementById('execution-result');
+            
+            button.disabled = true;
+            button.innerHTML = '<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mx-auto"></div> Exécution...';
+            
+            document.getElementById('loading-overlay').classList.remove('hidden');
+
+            try {
+                const response = await fetch(API_BASE + '/api/ai-agents/execute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer mock-token'
+                    },
+                    body: JSON.stringify({
+                        agentType: agentType,
+                        prompt: prompt.trim(),
+                        provider: provider || undefined
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.data) {
+                    resultDiv.innerHTML = `
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-2 text-green-600">
+                                <i data-lucide="check-circle" class="w-5 h-5"></i>
+                                <span class="font-medium">Exécution réussie!</span>
+                            </div>
+                            
+                            <div class="grid grid-cols-3 gap-2 text-xs">
+                                <div class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-center">
+                                    ${data.data.usage?.totalTokens || 0} tokens
+                                </div>
+                                <div class="bg-green-100 text-green-800 px-2 py-1 rounded text-center">
+                                    ${data.data.duration || 0}ms
+                                </div>
+                                <div class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-center">
+                                    $${(data.data.cost || 0).toFixed(4)}
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white border rounded-lg p-4">
+                                <h5 class="font-medium text-gray-900 mb-2">Résultat de l'IA:</h5>
+                                <div class="text-sm text-gray-700 whitespace-pre-wrap">${data.data.content}</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    showToast('Agent IA exécuté avec succès!', 'success');
+                } else {
+                    throw new Error(data.error || data.message || 'Échec de l\'exécution');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-2 text-red-600">
+                            <i data-lucide="alert-circle" class="w-5 h-5"></i>
+                            <span class="font-medium">Erreur d'exécution</span>
+                        </div>
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                            <p class="text-sm text-red-700">${error.message}</p>
+                        </div>
+                    </div>
+                `;
+                
+                showToast('Erreur lors de l\'exécution: ' + error.message, 'error');
+            } finally {
+                button.disabled = false;
+                button.innerHTML = '<i data-lucide="play" class="w-4 h-4 mr-2 inline"></i> Exécuter l\'Agent IA';
+                
+                document.getElementById('loading-overlay').classList.add('hidden');
+                
+                // Re-initialize icons
+                lucide.createIcons();
+            }
+        }
+
+        // Toast notification system
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const colors = {
+                'success': 'bg-green-500',
+                'error': 'bg-red-500',
+                'warning': 'bg-yellow-500',
+                'info': 'bg-blue-500'
+            };
+            
+            toast.className = `${colors[type]} text-white px-4 py-2 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full opacity-0`;
+            toast.textContent = message;
+            
+            container.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full', 'opacity-0');
+            }, 100);
+            
+            // Auto remove
+            setTimeout(() => {
+                toast.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, 4000);
+        }
+
+        // Document Manager Functions
+        let currentView = 'grid';
+        let documents = [
+            {
+                id: 'doc1',
+                name: 'Guide Marketing Digital.pdf',
+                type: 'pdf',
+                size: '2.1 MB',
+                status: 'completed',
+                uploadDate: 'Il y a 2 jours',
+                extracted: true
+            },
+            {
+                id: 'doc2', 
+                name: 'Présentation Stratégie.pptx',
+                type: 'pptx',
+                size: '5.4 MB',
+                status: 'processing',
+                uploadDate: 'Il y a 1 semaine',
+                extracted: false
+            },
+            {
+                id: 'doc3',
+                name: 'Infographie Données.png', 
+                type: 'png',
+                size: '1.2 MB',
+                status: 'completed',
+                uploadDate: 'Il y a 3 jours',
+                extracted: true
+            },
+            {
+                id: 'doc4',
+                name: 'Tutoriel Formation.mp4',
+                type: 'mp4', 
+                size: '45.7 MB',
+                status: 'error',
+                uploadDate: 'Il y a 5 jours',
+                extracted: false
+            }
+        ];
+
+        function showUploadModal() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.onclick = (e) => {
+                if (e.target === modal) hideUploadModal();
+            };
+            
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4" onclick="event.stopPropagation()">
+                    <div class="px-6 py-4 border-b">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-semibold text-gray-900">Upload de Document</h3>
+                            <button onclick="hideUploadModal()" class="text-gray-400 hover:text-gray-600">
+                                <i data-lucide="x" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="px-6 py-4">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Fichier</label>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors cursor-pointer" onclick="document.getElementById('file-input').click()">
+                                    <input type="file" id="file-input" class="hidden" accept=".pdf,.docx,.pptx,.txt,.png,.jpg,.jpeg,.mp4,.mov" onchange="handleFileSelect(this)">
+                                    <div id="file-drop-area">
+                                        <i data-lucide="upload-cloud" class="w-12 h-12 text-gray-400 mx-auto mb-2"></i>
+                                        <p class="text-gray-600 mb-1">Glissez votre fichier ici ou cliquez pour sélectionner</p>
+                                        <p class="text-xs text-gray-500">PDF, DOCX, PPTX, Images, Vidéos (Max 100MB)</p>
+                                    </div>
+                                    <div id="file-preview" class="hidden">
+                                        <div class="flex items-center justify-center space-x-2">
+                                            <i data-lucide="file" class="w-8 h-8 text-blue-600"></i>
+                                            <div class="text-left">
+                                                <p id="file-name" class="font-medium text-gray-900"></p>
+                                                <p id="file-size" class="text-sm text-gray-500"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Titre (optionnel)</label>
+                                <input type="text" id="document-title" placeholder="Titre personnalisé pour le document" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Options de traitement</label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="auto-extract" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-700">Extraction automatique du contenu</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="ai-analysis" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-700">Analyse IA immédiate</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" id="create-course" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2 text-sm text-gray-700">Générer un cours basé sur ce document</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="px-6 py-4 border-t bg-gray-50 rounded-b-lg">
+                        <div class="flex justify-end space-x-3">
+                            <button onclick="hideUploadModal()" class="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors">
+                                Annuler
+                            </button>
+                            <button onclick="uploadDocument()" id="upload-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                <i data-lucide="upload" class="w-4 h-4 inline mr-2"></i>
+                                Uploader
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            lucide.createIcons();
+        }
+
+        function hideUploadModal() {
+            const modal = document.querySelector('.fixed.inset-0.bg-black');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        function handleFileSelect(input) {
+            const file = input.files[0];
+            if (file) {
+                document.getElementById('file-drop-area').classList.add('hidden');
+                document.getElementById('file-preview').classList.remove('hidden');
+                document.getElementById('file-name').textContent = file.name;
+                document.getElementById('file-size').textContent = formatFileSize(file.size);
+                document.getElementById('upload-btn').disabled = false;
+                
+                // Auto-fill title from filename
+                const title = file.name.split('.')[0];
+                document.getElementById('document-title').value = title;
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        async function uploadDocument() {
+            const fileInput = document.getElementById('file-input');
+            const file = fileInput.files[0];
+            const title = document.getElementById('document-title').value || file.name;
+            const autoExtract = document.getElementById('auto-extract').checked;
+            const aiAnalysis = document.getElementById('ai-analysis').checked;
+            const createCourse = document.getElementById('create-course').checked;
+            
+            if (!file) {
+                showToast('Veuillez sélectionner un fichier.', 'error');
+                return;
+            }
+            
+            const uploadBtn = document.getElementById('upload-btn');
+            uploadBtn.disabled = true;
+            uploadBtn.innerHTML = '<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mx-auto"></div> Upload...';
+            
+            try {
+                // Simulate upload process
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Add document to list
+                const newDoc = {
+                    id: 'doc' + (documents.length + 1),
+                    name: title,
+                    type: file.name.split('.').pop().toLowerCase(),
+                    size: formatFileSize(file.size),
+                    status: autoExtract ? 'processing' : 'completed',
+                    uploadDate: 'Maintenant',
+                    extracted: false
+                };
+                
+                documents.unshift(newDoc);
+                
+                // Update UI
+                updateDocumentStats();
+                refreshDocumentsView();
+                
+                hideUploadModal();
+                showToast('Document uploadé avec succès!', 'success');
+                
+                // Simulate processing if auto-extract is enabled
+                if (autoExtract) {
+                    setTimeout(() => {
+                        newDoc.status = 'completed';
+                        newDoc.extracted = true;
+                        refreshDocumentsView();
+                        showToast(`Contenu extrait de "${newDoc.name}"`, 'success');
+                        
+                        if (aiAnalysis) {
+                            setTimeout(() => {
+                                showToast(`Analyse IA terminée pour "${newDoc.name}"`, 'info');
+                            }, 2000);
+                        }
+                    }, 3000);
+                }
+                
+            } catch (error) {
+                showToast('Erreur lors de l\'upload: ' + error.message, 'error');
+            }
+        }
+
+        function toggleView(viewType) {
+            currentView = viewType;
+            const gridView = document.getElementById('documents-grid');
+            const listView = document.getElementById('documents-list');
+            const gridBtn = document.getElementById('grid-view-btn');
+            const listBtn = document.getElementById('list-view-btn');
+            
+            if (viewType === 'grid') {
+                gridView.classList.remove('hidden');
+                listView.classList.add('hidden');
+                gridBtn.classList.add('bg-blue-100', 'text-blue-600');
+                gridBtn.classList.remove('text-gray-600', 'hover:bg-gray-100');
+                listBtn.classList.remove('bg-blue-100', 'text-blue-600');
+                listBtn.classList.add('text-gray-600', 'hover:bg-gray-100');
+            } else {
+                gridView.classList.add('hidden');
+                listView.classList.remove('hidden');
+                listBtn.classList.add('bg-blue-100', 'text-blue-600');
+                listBtn.classList.remove('text-gray-600', 'hover:bg-gray-100');
+                gridBtn.classList.remove('bg-blue-100', 'text-blue-600');
+                gridBtn.classList.add('text-gray-600', 'hover:bg-gray-100');
+            }
+        }
+
+        function refreshDocuments() {
+            showToast('Actualisation des documents...', 'info');
+            // Simulate refresh
+            setTimeout(() => {
+                refreshDocumentsView();
+                showToast('Documents actualisés!', 'success');
+            }, 1000);
+        }
+
+        function refreshDocumentsView() {
+            // Re-render documents grid based on current filter
+            const searchTerm = document.getElementById('document-search')?.value.toLowerCase() || '';
+            const typeFilter = document.getElementById('document-filter-type')?.value || 'all';
+            const statusFilter = document.getElementById('document-filter-status')?.value || 'all';
+            
+            let filteredDocs = documents.filter(doc => {
+                const matchesSearch = doc.name.toLowerCase().includes(searchTerm);
+                const matchesType = typeFilter === 'all' || doc.type === typeFilter;
+                const matchesStatus = statusFilter === 'all' || doc.status === statusFilter;
+                return matchesSearch && matchesType && matchesStatus;
+            });
+            
+            // Update grid view (simplified - in real app would regenerate HTML)
+            updateDocumentStats();
+        }
+
+        function updateDocumentStats() {
+            const totalDocs = documents.length;
+            const extractedDocs = documents.filter(d => d.extracted).length;
+            const totalSize = documents.reduce((sum, doc) => {
+                const size = parseFloat(doc.size);
+                return sum + (isNaN(size) ? 0 : size);
+            }, 0);
+            const coursesGenerated = Math.floor(extractedDocs * 0.4); // Simulate courses generated
+            
+            document.getElementById('total-documents').textContent = totalDocs;
+            document.getElementById('extracted-content').textContent = extractedDocs;
+            document.getElementById('total-size').textContent = totalSize.toFixed(1) + 'MB';
+            document.getElementById('courses-generated').textContent = coursesGenerated;
+        }
+
+        function openDocument(docId) {
+            const doc = documents.find(d => d.id === docId);
+            if (!doc) return;
+            
+            showToast(`Ouverture de "${doc.name}"...`, 'info');
+            // In real app, would open document viewer
+        }
+
+        function analyzeDocument(docId) {
+            const doc = documents.find(d => d.id === docId);
+            if (!doc) return;
+            
+            showToast(`Analyse IA en cours pour "${doc.name}"...`, 'info');
+            
+            // Simulate AI analysis
+            setTimeout(() => {
+                showToast(`Analyse terminée! "${doc.name}" contient du matériel éducatif de qualité.`, 'success');
+            }, 3000);
+        }
+
+        function downloadDocument(docId) {
+            const doc = documents.find(d => d.id === docId);
+            if (!doc) return;
+            
+            showToast(`Téléchargement de "${doc.name}"...`, 'info');
+            // Simulate download
+        }
+
+        function deleteDocument(docId) {
+            const doc = documents.find(d => d.id === docId);
+            if (!doc) return;
+            
+            if (confirm(`Êtes-vous sûr de vouloir supprimer "${doc.name}" ?
+Cette action est irréversible.`)) {
+                const index = documents.findIndex(d => d.id === docId);
+                if (index > -1) {
+                    documents.splice(index, 1);
+                    refreshDocumentsView();
+                    showToast(`"${doc.name}" a été supprimé.`, 'success');
+                }
+            }
+        }
+
+        function bulkAnalyze() {
+            const completedDocs = documents.filter(d => d.status === 'completed');
+            if (completedDocs.length === 0) {
+                showToast('Aucun document traité disponible pour l\'analyse.', 'warning');
+                return;
+            }
+            
+            showToast(`Analyse groupée de ${completedDocs.length} documents...`, 'info');
+            
+            // Simulate bulk analysis
+            setTimeout(() => {
+                showToast(`Analyse groupée terminée! ${completedDocs.length} documents analysés.`, 'success');
+            }, 5000);
+        }
+
+        // Add search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('document-search');
+            const typeFilter = document.getElementById('document-filter-type');
+            const statusFilter = document.getElementById('document-filter-status');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', refreshDocumentsView);
+            }
+            if (typeFilter) {
+                typeFilter.addEventListener('change', refreshDocumentsView);
+            }
+            if (statusFilter) {
+                statusFilter.addEventListener('change', refreshDocumentsView);
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case '1': e.preventDefault(); showPage('dashboard'); break;
+                    case '2': e.preventDefault(); showPage('ai-agents'); break;
+                    case '3': e.preventDefault(); showPage('courses'); break;
+                    case '4': e.preventDefault(); showPage('documents'); break;
+                    case '5': e.preventDefault(); showPage('settings'); break;
+                    case 'u': 
+                        e.preventDefault(); 
+                        if (currentPage === 'documents') showUploadModal();
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CourseForge AI - Settings Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {}
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen py-8">
+        <div class="max-w-4xl mx-auto px-4">
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">CourseForge AI Settings</h1>
+                <p class="text-gray-600">Manage your LLM providers and API keys</p>
+                <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p class="text-blue-800 text-sm">
+                        <strong>Backend API:</strong> 
+                        <span id="api-url" class="font-mono">https://3007-ic3ifp4wllje0oyfwv7fr-6532622b.e2b.dev</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Status Display -->
+            <div id="status" class="mb-6"></div>
+
+            <!-- Tabs -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="border-b">
+                    <nav class="flex space-x-8 px-6 py-4">
+                        <button onclick="showTab('providers')" id="providers-tab" 
+                                class="tab-button font-medium text-blue-600 border-b-2 border-blue-600">
+                            LLM Providers
+                        </button>
+                        <button onclick="showTab('api-keys')" id="api-keys-tab" 
+                                class="tab-button font-medium text-gray-500 hover:text-gray-700">
+                            API Keys
+                        </button>
+                        <button onclick="showTab('test')" id="test-tab" 
+                                class="tab-button font-medium text-gray-500 hover:text-gray-700">
+                            Test AI Agent
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Providers Tab -->
+                <div id="providers-content" class="tab-content p-6">
+                    <h2 class="text-xl font-semibold mb-4">Available LLM Providers</h2>
+                    <div id="providers-list" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        <div class="text-center py-8">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                            <p class="mt-2 text-gray-500">Loading providers...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Keys Tab -->
+                <div id="api-keys-content" class="tab-content p-6 hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold">API Key Management</h2>
+                        <button onclick="showAddKeyForm()" 
+                                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            Add API Key
+                        </button>
+                    </div>
+                    
+                    <!-- Add API Key Form -->
+                    <div id="add-key-form" class="hidden mb-6 p-4 bg-gray-50 rounded-lg">
+                        <h3 class="font-medium mb-3">Add New API Key</h3>
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Provider</label>
+                                <select id="provider-select" class="w-full p-2 border rounded-lg">
+                                    <option value="">Select a provider</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">API Key</label>
+                                <input type="password" id="api-key-input" placeholder="Enter your API key" 
+                                       class="w-full p-2 border rounded-lg">
+                            </div>
+                        </div>
+                        <div class="mt-4 flex space-x-2">
+                            <button onclick="addApiKey()" 
+                                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                                Save API Key
+                            </button>
+                            <button onclick="hideAddKeyForm()" 
+                                    class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="api-keys-list" class="space-y-3">
+                        <div class="text-center py-8">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                            <p class="mt-2 text-gray-500">Loading API keys...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Test Tab -->
+                <div id="test-content" class="tab-content p-6 hidden">
+                    <h2 class="text-xl font-semibold mb-4">Test AI Agent</h2>
+                    
+                    <div class="space-y-4">
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">AI Agent</label>
+                                <select id="agent-select" class="w-full p-2 border rounded-lg">
+                                    <option value="">Select an agent</option>
+                                    <option value="ARCHITECT">Course Architect</option>
+                                    <option value="RESEARCH">Research Assistant</option>
+                                    <option value="WRITING">Content Writer</option>
+                                    <option value="EDITING">Content Editor</option>
+                                    <option value="QUALITY">Quality Assurance</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Provider (Optional)</label>
+                                <select id="test-provider-select" class="w-full p-2 border rounded-lg">
+                                    <option value="">Use default provider</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Prompt</label>
+                            <textarea id="prompt-input" rows="4" placeholder="Enter your prompt for the AI agent..."
+                                      class="w-full p-2 border rounded-lg"></textarea>
+                        </div>
+
+                        <button onclick="testAIAgent()" id="test-button"
+                                class="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                            Execute AI Agent
+                        </button>
+
+                        <div id="test-result" class="hidden mt-4 p-4 border rounded-lg"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://3007-ic3ifp4wllje0oyfwv7fr-6532622b.e2b.dev';
+        let providers = [];
+        let userSettings = {};
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProviders();
+            loadUserSettings();
+        });
+
+        // Tab management
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+                button.classList.add('text-gray-500');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-content').classList.remove('hidden');
+            
+            // Activate selected tab
+            const activeTab = document.getElementById(tabName + '-tab');
+            activeTab.classList.remove('text-gray-500');
+            activeTab.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+        }
+
+        // API helper function
+        async function apiCall(endpoint, options = {}) {
+            try {
+                const response = await fetch(API_BASE + endpoint, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer mock-token',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'API call failed');
+                }
+                
+                return data;
+            } catch (error) {
+                showStatus('Error: ' + error.message, 'error');
+                throw error;
+            }
+        }
+
+        // Show status messages
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            const bgColor = type === 'error' ? 'bg-red-50 border-red-200 text-red-800' : 
+                           type === 'success' ? 'bg-green-50 border-green-200 text-green-800' :
+                           'bg-blue-50 border-blue-200 text-blue-800';
+            
+            statusDiv.innerHTML = `
+                <div class="${bgColor} border p-4 rounded-lg">
+                    ${message}
+                </div>
+            `;
+            
+            setTimeout(() => {
+                statusDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        // Load LLM providers
+        async function loadProviders() {
+            try {
+                const data = await apiCall('/api/settings/providers');
+                providers = data.data;
+                displayProviders();
+                populateProviderSelects();
+            } catch (error) {
+                document.getElementById('providers-list').innerHTML = 
+                    '<div class="text-center py-8 text-red-600">Failed to load providers</div>';
+            }
+        }
+
+        // Display providers
+        function displayProviders() {
+            const container = document.getElementById('providers-list');
+            container.innerHTML = providers.map(provider => `
+                <div class="border rounded-lg p-4 ${userSettings.apiKeys && userSettings.apiKeys[provider.name] ? 'bg-green-50 border-green-200' : ''}">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-medium">${provider.displayName}</h3>
+                        <div class="flex space-x-1">
+                            ${provider.isDefault ? '<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Default</span>' : ''}
+                            ${userSettings.apiKeys && userSettings.apiKeys[provider.name] ? '<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Connected</span>' : ''}
+                        </div>
+                    </div>
+                    ${provider.pricing ? `
+                        <div class="text-sm text-gray-600 mb-2">
+                            $${(provider.pricing.input * 1000).toFixed(2)}/1M tokens
+                        </div>
+                    ` : ''}
+                    <div class="flex flex-wrap gap-1 mb-2">
+                        ${provider.models.slice(0, 3).map(model => 
+                            `<span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">${model}</span>`
+                        ).join('')}
+                        ${provider.models.length > 3 ? `<span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">+${provider.models.length - 3} more</span>` : ''}
+                    </div>
+                    <div class="flex flex-wrap gap-1">
+                        ${provider.features.slice(0, 4).map(feature => 
+                            `<span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded">${feature}</span>`
+                        ).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Populate provider selects
+        function populateProviderSelects() {
+            const providerSelect = document.getElementById('provider-select');
+            const testProviderSelect = document.getElementById('test-provider-select');
+            
+            // Available providers (those without API keys)
+            const availableProviders = providers.filter(p => 
+                (!userSettings.apiKeys || !userSettings.apiKeys[p.name]) && p.authType !== 'NONE'
+            );
+            
+            providerSelect.innerHTML = '<option value="">Select a provider</option>' +
+                availableProviders.map(p => 
+                    `<option value="${p.name}">${p.displayName}</option>`
+                ).join('');
+            
+            // All providers for testing
+            testProviderSelect.innerHTML = '<option value="">Use default provider</option>' +
+                providers.map(p => 
+                    `<option value="${p.name}">${p.displayName}</option>`
+                ).join('');
+        }
+
+        // Load user settings
+        async function loadUserSettings() {
+            try {
+                const data = await apiCall('/api/settings');
+                userSettings = data.data;
+                displayApiKeys();
+                displayProviders(); // Refresh to show connected status
+            } catch (error) {
+                document.getElementById('api-keys-list').innerHTML = 
+                    '<div class="text-center py-8 text-red-600">Failed to load settings</div>';
+            }
+        }
+
+        // Display API keys
+        function displayApiKeys() {
+            const container = document.getElementById('api-keys-list');
+            
+            if (!userSettings.apiKeys || Object.keys(userSettings.apiKeys).length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <p>No API keys configured yet.</p>
+                        <p class="text-sm">Add your first API key to start using AI agents.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = Object.entries(userSettings.apiKeys).map(([providerName, maskedKey]) => {
+                const provider = providers.find(p => p.name === providerName);
+                const isDefault = userSettings.preferences?.defaultProvider === providerName;
+                
+                return `
+                    <div class="flex items-center justify-between p-4 border rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                🤖
+                            </div>
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-medium">${provider?.displayName || providerName}</span>
+                                    ${isDefault ? '<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Default</span>' : ''}
+                                </div>
+                                <div class="flex items-center space-x-2 text-sm text-gray-500">
+                                    <span>${maskedKey}</span>
+                                    ${provider?.pricing ? `<span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded">$${(provider.pricing.input * 1000).toFixed(2)}/1M tokens</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="testApiKey('${providerName}')" 
+                                    class="bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-200">
+                                Test
+                            </button>
+                            <button onclick="removeApiKey('${providerName}')" 
+                                    class="bg-red-100 text-red-700 px-3 py-1 rounded text-sm hover:bg-red-200">
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Add API Key functions
+        function showAddKeyForm() {
+            document.getElementById('add-key-form').classList.remove('hidden');
+        }
+
+        function hideAddKeyForm() {
+            document.getElementById('add-key-form').classList.add('hidden');
+            document.getElementById('provider-select').value = '';
+            document.getElementById('api-key-input').value = '';
+        }
+
+        async function addApiKey() {
+            const provider = document.getElementById('provider-select').value;
+            const apiKey = document.getElementById('api-key-input').value;
+
+            if (!provider || !apiKey.trim()) {
+                showStatus('Please select a provider and enter an API key', 'error');
+                return;
+            }
+
+            try {
+                await apiCall('/api/settings/api-keys', {
+                    method: 'POST',
+                    body: JSON.stringify({ provider, apiKey: apiKey.trim() })
+                });
+
+                showStatus('API key added successfully!', 'success');
+                hideAddKeyForm();
+                await loadUserSettings();
+                populateProviderSelects();
+            } catch (error) {
+                // Error already shown by apiCall
+            }
+        }
+
+        async function removeApiKey(provider) {
+            if (!confirm('Are you sure you want to remove this API key?')) return;
+
+            try {
+                await apiCall(`/api/settings/api-keys/${provider}`, {
+                    method: 'DELETE'
+                });
+
+                showStatus('API key removed successfully', 'success');
+                await loadUserSettings();
+                populateProviderSelects();
+            } catch (error) {
+                // Error already shown by apiCall
+            }
+        }
+
+        async function testApiKey(provider) {
+            try {
+                const data = await apiCall(`/api/settings/api-keys/${provider}/test`, {
+                    method: 'POST'
+                });
+
+                showStatus(data.message || 'API key test completed', 'success');
+            } catch (error) {
+                // Error already shown by apiCall
+            }
+        }
+
+        // AI Agent testing
+        async function testAIAgent() {
+            const agentType = document.getElementById('agent-select').value;
+            const provider = document.getElementById('test-provider-select').value;
+            const prompt = document.getElementById('prompt-input').value;
+
+            if (!agentType || !prompt.trim()) {
+                showStatus('Please select an agent and enter a prompt', 'error');
+                return;
+            }
+
+            const button = document.getElementById('test-button');
+            const resultDiv = document.getElementById('test-result');
+
+            button.disabled = true;
+            button.innerHTML = 'Executing...';
+            resultDiv.classList.add('hidden');
+
+            try {
+                const requestBody = {
+                    agentType,
+                    prompt: prompt.trim()
+                };
+                
+                if (provider) {
+                    requestBody.provider = provider;
+                }
+
+                const data = await apiCall('/api/ai-agents/execute', {
+                    method: 'POST',
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                            <h3 class="font-medium text-green-800 mb-2">✅ Execution Successful</h3>
+                            <div class="space-y-2">
+                                <div class="text-sm text-green-700">
+                                    <strong>Duration:</strong> ${data.data.duration || 'Unknown'}ms | 
+                                    <strong>Tokens:</strong> ${data.data.usage?.totalTokens || 'Unknown'} |
+                                    <strong>Cost:</strong> $${(data.data.cost || 0).toFixed(4)}
+                                </div>
+                                <div class="bg-white p-3 rounded border text-sm">
+                                    <strong>AI Response:</strong><br>
+                                    <div class="mt-1 whitespace-pre-wrap">${data.data.content}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    showStatus('AI agent executed successfully!', 'success');
+                } else {
+                    throw new Error(data.error || 'Execution failed');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <h3 class="font-medium text-red-800 mb-2">❌ Execution Failed</h3>
+                        <p class="text-sm text-red-700">${error.message}</p>
+                    </div>
+                `;
+            } finally {
+                button.disabled = false;
+                button.innerHTML = 'Execute AI Agent';
+                resultDiv.classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>

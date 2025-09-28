@@ -40,6 +40,15 @@ app.post('/api/ai-agents/execute', asyncHandler(AIAgentsController.executeAgent)
 app.get('/api/ai-agents/executions', asyncHandler(AIAgentsController.getExecutionHistory))
 app.get('/api/ai-agents/usage', asyncHandler(AIAgentsController.getUsageStats))
 
+// Settings routes
+import { SettingsController } from './controllers/settings'
+app.get('/api/settings', asyncHandler(SettingsController.getSettings))
+app.put('/api/settings', asyncHandler(SettingsController.updateSettings))
+app.post('/api/settings/api-keys', asyncHandler(SettingsController.addApiKey))
+app.delete('/api/settings/api-keys/:provider', asyncHandler(SettingsController.removeApiKey))
+app.post('/api/settings/api-keys/:provider/test', asyncHandler(SettingsController.testApiKey))
+app.get('/api/settings/providers', asyncHandler(SettingsController.getProviders))
+
 // Test database connection
 app.get('/api/test-db', async (req, res) => {
   try {
