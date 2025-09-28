@@ -203,24 +203,48 @@ export function Sidebar() {
         {/* AI Agent Quick Access */}
         {!collapsed && (
           <div className="pt-4">
-            <div className="flex items-center space-x-2 px-3 py-2 text-xs font-medium text-muted-foreground">
-              <Sparkles className="h-3 w-3" />
-              <span>AI AGENTS</span>
+            <div className="flex items-center justify-between px-3 py-2">
+              <div className="flex items-center space-x-2 text-xs font-medium text-muted-foreground">
+                <Sparkles className="h-3 w-3" />
+                <span>AI AGENTS</span>
+              </div>
+              <Link href="/dashboard/ai-agents">
+                <Button variant="ghost" size="sm" className="h-5 text-xs">
+                  View All
+                </Button>
+              </Link>
             </div>
             <div className="space-y-1 mt-2">
               {[
-                { name: 'Architect', icon: '🏗️', href: '/dashboard/ai-agents/architect' },
-                { name: 'Research', icon: '🔍', href: '/dashboard/ai-agents/research' },
-                { name: 'Writing', icon: '✍️', href: '/dashboard/ai-agents/writing' },
-                { name: 'Quality', icon: '✅', href: '/dashboard/ai-agents/quality' },
+                { name: 'Architect', icon: '🏗️', type: 'ARCHITECT', description: 'Structure courses' },
+                { name: 'Research', icon: '🔍', type: 'RESEARCH', description: 'Fact checking' },
+                { name: 'Writing', icon: '✍️', type: 'WRITING', description: 'Content creation' },
+                { name: 'Quality', icon: '🛡️', type: 'QUALITY', description: 'Standards review' },
               ].map((agent) => (
-                <Link key={agent.name} href={agent.href}>
+                <Link key={agent.name} href={`/dashboard/ai-agents?agent=${agent.type}`}>
                   <div className={cn(
-                    "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-accent hover:text-accent-foreground",
-                    pathname === agent.href ? "bg-accent text-accent-foreground" : "text-muted-foreground"
+                    "group flex items-center space-x-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-accent hover:text-accent-foreground cursor-pointer",
+                    "text-muted-foreground"
                   )}>
                     <span className="text-base">{agent.icon}</span>
-                    <span className="flex-1">{agent.name}</span>
+                    <div className="flex-1 min-w-0">
+                      <span className="block font-medium">{agent.name}</span>
+                      <span className="text-xs text-muted-foreground group-hover:text-accent-foreground/70">
+                        {agent.description}
+                      </span>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        // This will be handled by a global AI agent execution context
+                        console.log(`Quick execute ${agent.name}`)
+                      }}
+                    >
+                      <Bot className="h-3 w-3" />
+                    </Button>
                   </div>
                 </Link>
               ))}
